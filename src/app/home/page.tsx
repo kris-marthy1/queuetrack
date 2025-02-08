@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     const fetchTables = async () => {
       try {
-        const response = await axios.get('http://queuetrack.site/get-tables'); // Laravel endpoint
+        const response = await axios.get('https://queuetrack.site/get-tables'); // Laravel endpoint
         setTables(response.data); // Directly set tables
       } catch(error){
         setError('Failed to fetch tables. Please try again later.');
@@ -29,7 +29,7 @@ export default function Home() {
   }, []);
 
   const handleTableClick = (tableName: string) => {
-    router.push(`/serviceWindow?page=${tableName}`);
+    router.push(`/serviceWindow?page=${tableName.toLowerCase()}`);
   };
 
   if (loading) {

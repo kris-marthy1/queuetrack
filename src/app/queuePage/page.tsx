@@ -61,7 +61,7 @@ function ServiceWindowContent() {
   
     const fetchQueueStatus = async () => {
       try {
-        const response = await axios.post('http://queuetrack.site/queue-status', {
+        const response = await axios.post('https://queuetrack.site/queue-status', {
           table_name: tableName?.toLowerCase(),
         });
         setQueueSession(response.data.in_queue ? response.data : null);
@@ -73,7 +73,7 @@ function ServiceWindowContent() {
   
     const fetchEstimatedTime = async () => {
       try {
-        const timeResponse = await axios.post('http://queuetrack.site/duration', {
+        const timeResponse = await axios.post('https://queuetrack.site/duration', {
           table_name: tableName?.toLowerCase(),
         });
         setEstimatedTime(timeResponse.data.estimated_duration ? timeResponse.data : null);
@@ -84,8 +84,8 @@ function ServiceWindowContent() {
   
     const fetchTableData = async () => {
       try {
-        const columnResponse = await axios.post('http://queuetrack.site/get-table-columns', { table_name: tableName });
-        const dataResponse = await axios.post('http://queuetrack.site/get-table-data', { table_name: tableName });
+        const columnResponse = await axios.post('https://queuetrack.site/get-table-columns', { table_name: tableName });
+        const dataResponse = await axios.post('https://queuetrack.site/get-table-data', { table_name: tableName });
         setColumns(columnResponse.data);
         setTableData(dataResponse.data);
       } catch {
@@ -119,7 +119,7 @@ function ServiceWindowContent() {
 
   const handleExitQueue = async () => {
     try {
-      await axios.post('http://queuetrack.site/exit-queue', {
+      await axios.post('https://queuetrack.site/exit-queue', {
         sessionId: queueSession?.id,
         window_id: queueSession?.window_id,
         queue_id: queueSession?.queue_id,
@@ -241,7 +241,7 @@ function ServiceWindowContent() {
     </Table>
   </TableContainer>
 ) : (
-  <Typography variant="body1" color="textSecondary">No remaining items in the queue.</Typography>
+  <Typography variant="body1" color="textSecondary">No remaining people in the queue.</Typography>
 )}
 
 

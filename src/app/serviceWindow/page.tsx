@@ -32,10 +32,10 @@ function ServiceWindowContent() {
   const tableName = searchParams.get('page')?.toLowerCase(); // Get table name from query params
     const fetchQueueStatus = async () => {
       try {
-        const userIP = await axios.get('http://queuetrack.site/fetch-ip');
+        const userIP = await axios.get('https://queuetrack.site/fetch-ip');
 
 
-        const response = await axios.post('http://queuetrack.site/queue-status', {
+        const response = await axios.post('https://queuetrack.site/queue-status', {
           table_name: tableName
         });
         
@@ -64,7 +64,7 @@ function ServiceWindowContent() {
   useEffect(() => {
     const fetchColumns = async () => {
       try {
-        const response = await axios.post('http://queuetrack.site/get-table-columns', {
+        const response = await axios.post('https://queuetrack.site/get-table-columns', {
           table_name: tableName,
         });
         setColumns(response.data);
@@ -90,7 +90,7 @@ function ServiceWindowContent() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('http://queuetrack.site/join-queue', {
+      const response = await axios.post('https://queuetrack.site/join-queue', {
         table_name: tableName,
         ...formData,
       });
