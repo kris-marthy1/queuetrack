@@ -70,7 +70,7 @@ function ServiceWindowContent() {
         setColumns(response.data);
         // Initialize form data with empty strings for each column
         const initialFormData = response.data.reduce((acc: any, column: string) => {
-          acc[column] = '';
+          acc[column] = column === 'priority' ? 'None' : ''; // Set 'None' for priority by default
           return acc;
         }, {});
         setFormData(initialFormData);
