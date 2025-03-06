@@ -42,7 +42,7 @@ function ServiceWindowContent() {
         if (response.data.in_queue) {
           if(
             response.data.in_queue &&
-            tableName === response.data.window_name &&
+            tableName === response.data.window_name.toLowerCase() &&
             userIP.data.ip_address === response.data.ip_address &&
             !alertShown.current // Check if alert was already shown
           ){
