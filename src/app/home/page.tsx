@@ -29,7 +29,7 @@ export default function Home() {
   }, []);
 
   const handleTableClick = (tableName: string) => {
-    router.push(`/serviceWindow?page=${tableName}`);
+    router.push(`/serviceWindow?page=${tableName.toLowerCase()}`);
   };
 
   if (loading) {
