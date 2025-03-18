@@ -3,8 +3,8 @@ import React from 'react'
 
 
 export const metadata = {
-  title: "QueueTrack - A Queueing System |  Online Queue System", // Optimized title
-  description: "Experience an efficient and real-time queue management system designed to prioritize customers and reduce wait times.",
+  title: "QueueTrack | An Online Queue Management System",
+  description: "QueueTrack is a smart queue management system that reduces wait times and prioritizes customers efficiently. Get real-time queue updates now!",
    icons: {
     icon: "/favicon.ico",
   },
