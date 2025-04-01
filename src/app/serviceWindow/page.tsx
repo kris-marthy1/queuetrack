@@ -130,7 +130,7 @@ function ServiceWindowContent() {
       });
   
       if (response.data.message === 'Joined queue successfully') {
-        alert('Data submitted successfully!');
+           alert(`Data submitted successfully! Priority: ${formData.priority}`);
         router.push(`/queuePage?page=${tableName}`);
       } else {
         alert('Failed to join queue. Please try again.');
