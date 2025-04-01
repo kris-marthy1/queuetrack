@@ -179,14 +179,14 @@ function ServiceWindowContent() {
         <Typography variant="h5" mb={6} mt={2}>
           Fill out the form for: {tableName}
         </Typography>
-        {columns.filter(column => column !== 'queue_id').map((column) => {
+       {columns.filter(column => column !== 'queue_id').map((column) => {
   if (column === 'priority') {
     return (
       <TextField
         select
         key={column}
         label={formatLabel(column)}
-        value={formData[column] === "N/A" ? "None" : (formData[column] || 'None')}
+        value={formData[column] || 'None'}
         onChange={(e) => handleInputChange(column, e.target.value)}
         variant="outlined"
         fullWidth
@@ -197,7 +197,7 @@ function ServiceWindowContent() {
       </TextField>
     );
   } else if (column.toLowerCase().includes('email')) {
-    // Special handling for email fields
+    // Email field handling remains the same
     return (
       <TextField
         key={column}
@@ -212,6 +212,7 @@ function ServiceWindowContent() {
       />
     );
   } else {
+    // Other fields remain the same
     return (
       <TextField
         key={column}
