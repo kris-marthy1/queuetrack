@@ -21,6 +21,7 @@ function ServiceWindowContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tableName = searchParams.get('page'); // Get table name from query params
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
   const [columns, setColumns] = useState<string[]>([]);
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
@@ -32,10 +33,10 @@ function ServiceWindowContent() {
   const tableName = searchParams.get('page')?.toLowerCase(); // Get table name from query params
     const fetchQueueStatus = async () => {
       try {
-        const userIP = await axios.get('https://queuetrack.site/fetch-ip');
+        const userIP = await axios.get('http://localhost:8001/fetch-ip');
 
 
-        const response = await axios.post('https://queuetrack.site/queue-status', {
+        const response = await axios.post('http://localhost:8001/queue-status', {
           table_name: tableName
         });
         
@@ -64,13 +65,13 @@ function ServiceWindowContent() {
   useEffect(() => {
     const fetchColumns = async () => {
       try {
-        const response = await axios.post('https://queuetrack.site/get-table-columns', {
+        const response = await axios.post('http://localhost:8001/get-table-columns', {
           table_name: tableName,
         });
         setColumns(response.data);
         // Initialize form data with empty strings for each column
         const initialFormData = response.data.reduce((acc: any, column: string) => {
-          acc[column] = column === 'priority' ? 'None' : ''; // Set 'None' for priority by default
+          acc[column] = '';
           return acc;
         }, {});
         setFormData(initialFormData);
@@ -84,17 +85,50 @@ function ServiceWindowContent() {
     fetchColumns();
   }, [tableName]);
 
+
   const handleInputChange = (column: string, value: string) => {
     setFormData((prev) => ({ ...prev, [column]: value }));
+    
+    // Email validation for fields with "email" in their name
+    if (column.toLowerCase().includes('email') && value) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(value)) {
+        setFormErrors((prev) => ({ ...prev, [column]: 'Please enter a valid email address' }));
+      } else {
+        setFormErrors((prev) => ({ ...prev, [column]: '' }));
+      }
+    }
   };
 
   const handleSubmit = async () => {
+    // Validate all email fields
+    let isValid = true;
+    const newErrors: { [key: string]: string } = {};
+    
+    Object.keys(formData).forEach(column => {
+      if (column.toLowerCase().includes('email')) {
+        const value = formData[column];
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!value || !emailRegex.test(value)) {
+          newErrors[column] = 'PLEASE ENTER A VALID EMAIL ADDRESS!!!';
+          isValid = false;
+        }
+      }
+    });
+    
+    setFormErrors(newErrors);
+    
+    if (!isValid) {
+      return; // Don't submit if validation fails
+    }
+    
+    // Continue with your existing submit logic
     try {
-      const response = await axios.post('https://queuetrack.site/join-queue', {
+      const response = await axios.post('http://localhost:8001/join-queue', {
         table_name: tableName,
         ...formData,
       });
-
+  
       if (response.data.message === 'Joined queue successfully') {
         alert('Data submitted successfully!');
         router.push(`/queuePage?page=${tableName}`);
@@ -145,33 +179,52 @@ function ServiceWindowContent() {
         <Typography variant="h5" mb={6} mt={2}>
           Fill out the form for: {tableName}
         </Typography>
-  
-        {columns.filter(column => column !== 'queue_id').map((column) => (
-          column === 'priority' ? (
-            <TextField
-              select
-              key={column}
-              label={formatLabel(column)}
-              value={formData[column] || 'None'} // Set "None" as default
-              onChange={(e) => handleInputChange(column, e.target.value)}
-              variant="outlined"
-              fullWidth
-            >
-              <MenuItem value="None">None</MenuItem>
-              <MenuItem value="PWD">PWD</MenuItem>
-              <MenuItem value="Pregnant">Pregnant</MenuItem>
-            </TextField>
-          ) : (
-            <TextField
-              key={column}
-              label={formatLabel(column)}
-              value={formData[column] || ''}
-              onChange={(e) => handleInputChange(column, e.target.value)}
-              variant="outlined"
-              fullWidth
-            />
-          )
-        ))}
+        {columns.filter(column => column !== 'queue_id').map((column) => {
+  if (column === 'priority') {
+    return (
+      <TextField
+        select
+        key={column}
+        label={formatLabel(column)}
+        value={formData[column] || 'None'} 
+        onChange={(e) => handleInputChange(column, e.target.value)}
+        variant="outlined"
+        fullWidth
+      >
+        <MenuItem value="None">None</MenuItem>
+        <MenuItem value="PWD">PWD</MenuItem>
+        <MenuItem value="Pregnant">Pregnant</MenuItem>
+      </TextField>
+    );
+  } else if (column.toLowerCase().includes('email')) {
+    // Special handling for email fields
+    return (
+      <TextField
+        key={column}
+        label={formatLabel(column)}
+        value={formData[column] || ''}
+        onChange={(e) => handleInputChange(column, e.target.value)}
+        variant="outlined"
+        fullWidth
+        type="email"
+        error={formErrors && formErrors[column] ? true : false}
+        helperText={formErrors && formErrors[column] ? formErrors[column] : ''}
+      />
+    );
+  } else {
+    return (
+      <TextField
+        key={column}
+        label={formatLabel(column)}
+        value={formData[column] || ''}
+        onChange={(e) => handleInputChange(column, e.target.value)}
+        variant="outlined"
+        fullWidth
+      />
+    );
+  }
+})}
+ 
   
         <Button
           variant="contained"
