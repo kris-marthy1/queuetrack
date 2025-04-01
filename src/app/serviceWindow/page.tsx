@@ -186,7 +186,7 @@ function ServiceWindowContent() {
         select
         key={column}
         label={formatLabel(column)}
-        value={formData[column] || 'None'} 
+        value={formData[column] === "N/A" ? "None" : (formData[column] || 'None')}
         onChange={(e) => handleInputChange(column, e.target.value)}
         variant="outlined"
         fullWidth
