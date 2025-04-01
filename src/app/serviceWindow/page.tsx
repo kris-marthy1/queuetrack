@@ -194,6 +194,7 @@ function ServiceWindowContent() {
       >
         <MenuItem value="">---Choose here---</MenuItem>
         <MenuItem value="None">None</MenuItem>
+        <MenuItem value="SeniorCitizen">Senior Citizen</MenuItem>
         <MenuItem value="PWD">PWD</MenuItem>
         <MenuItem value="Pregnant">Pregnant</MenuItem>
       </TextField>
