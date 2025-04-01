@@ -16,12 +16,6 @@ const formatLabel = (snakeCase: string) => {
     .join(' ');
 };
 
-// Email validation function
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return emailRegex.test(email);
-};
-
 // Separate component to handle search params
 function ServiceWindowContent() {
   const router = useRouter();
@@ -30,16 +24,16 @@ function ServiceWindowContent() {
 
   const [columns, setColumns] = useState<string[]>([]);
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const alertShown = useRef(false); // Track if alert has been shown
 
   useEffect(() => {
-    const tableName = searchParams.get('page')?.toLowerCase(); // Get table name from query params
+  const tableName = searchParams.get('page')?.toLowerCase(); // Get table name from query params
     const fetchQueueStatus = async () => {
       try {
         const userIP = await axios.get('http://localhost:8001/fetch-ip');
+
 
         const response = await axios.post('http://localhost:8001/queue-status', {
           table_name: tableName
@@ -52,20 +46,20 @@ function ServiceWindowContent() {
             userIP.data.ip_address === response.data.ip_address &&
             !alertShown.current // Check if alert was already shown
           ){
-            alert(`You are already in queue for ${tableName}`);
+            alert(You are already in queue for ${tableName})
             alertShown.current = true; // Prevent future alerts
-            router.push(`/queuePage?page=${tableName}`);
+            router.push(/queuePage?page=${tableName});
           }
         } 
       } catch (err) {
-        console.log('No queue active for the user');
+        console.log('No queue active for the user')
       }
     };
 
     if (tableName) {
       fetchQueueStatus();
     }
-  }, [tableName, router, searchParams]);
+  }, [tableName, router]);
 
   useEffect(() => {
     const fetchColumns = async () => {
@@ -92,47 +86,9 @@ function ServiceWindowContent() {
 
   const handleInputChange = (column: string, value: string) => {
     setFormData((prev) => ({ ...prev, [column]: value }));
-    
-    // Clear error when user starts typing
-    if (formErrors[column]) {
-      setFormErrors((prev) => ({ ...prev, [column]: '' }));
-    }
-    
-    // Validate email fields immediately
-    if (column.toLowerCase().includes('email')) {
-      if (value && !isValidEmail(value)) {
-        setFormErrors((prev) => ({ ...prev, [column]: 'Please enter a valid email address' }));
-      }
-    }
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: { [key: string]: string } = {};
-    let isValid = true;
-    
-    // Check each field
-    Object.keys(formData).forEach((column) => {
-      // Email validation for any field containing 'email' in its name
-      if (column.toLowerCase().includes('email')) {
-        if (!formData[column]) {
-          newErrors[column] = 'Email is required';
-          isValid = false;
-        } else if (!isValidEmail(formData[column])) {
-          newErrors[column] = 'Please enter a valid email address';
-          isValid = false;
-        }
-      }
-    });
-    
-    setFormErrors(newErrors);
-    return isValid;
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
-    }
-    
     try {
       const response = await axios.post('http://localhost:8001/join-queue', {
         table_name: tableName,
@@ -141,7 +97,7 @@ function ServiceWindowContent() {
 
       if (response.data.message === 'Joined queue successfully') {
         alert('Data submitted successfully!');
-        router.push(`/queuePage?page=${tableName}`);
+        router.push(/queuePage?page=${tableName});
       } else {
         alert('Failed to join queue. Please try again.');
       }
@@ -213,12 +169,6 @@ function ServiceWindowContent() {
               onChange={(e) => handleInputChange(column, e.target.value)}
               variant="outlined"
               fullWidth
-              error={!!formErrors[column]}
-              helperText={formErrors[column] || ''}
-              type={column.toLowerCase().includes('email') ? 'email' : 'text'}
-              inputProps={{
-                pattern: column.toLowerCase().includes('email') ? '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$' : undefined
-              }}
             />
           )
         ))}
@@ -234,6 +184,7 @@ function ServiceWindowContent() {
       </Box>
     </>
   );
+  
 }
 
 export default function ServiceWindow() {
