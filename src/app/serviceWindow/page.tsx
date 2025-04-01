@@ -32,10 +32,10 @@ function ServiceWindowContent() {
   const tableName = searchParams.get('page')?.toLowerCase(); // Get table name from query params
     const fetchQueueStatus = async () => {
       try {
-        const userIP = await axios.get('http://localhost:8001/fetch-ip');
+        const userIP = await axios.get('https://queuetrack.site/fetch-ip');
 
 
-        const response = await axios.post('http://localhost:8001/queue-status', {
+        const response = await axios.post('https://queuetrack.site/queue-status', {
           table_name: tableName
         });
         
@@ -46,9 +46,9 @@ function ServiceWindowContent() {
             userIP.data.ip_address === response.data.ip_address &&
             !alertShown.current // Check if alert was already shown
           ){
-            alert(You are already in queue for ${tableName})
+            alert(`You are already in queue for ${tableName}`)
             alertShown.current = true; // Prevent future alerts
-            router.push(/queuePage?page=${tableName});
+            router.push(`/queuePage?page=${tableName}`);
           }
         } 
       } catch (err) {
@@ -64,13 +64,13 @@ function ServiceWindowContent() {
   useEffect(() => {
     const fetchColumns = async () => {
       try {
-        const response = await axios.post('http://localhost:8001/get-table-columns', {
+        const response = await axios.post('https://queuetrack.site/get-table-columns', {
           table_name: tableName,
         });
         setColumns(response.data);
         // Initialize form data with empty strings for each column
         const initialFormData = response.data.reduce((acc: any, column: string) => {
-          acc[column] = '';
+          acc[column] = column === 'priority' ? 'None' : ''; // Set 'None' for priority by default
           return acc;
         }, {});
         setFormData(initialFormData);
@@ -90,14 +90,14 @@ function ServiceWindowContent() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post('http://localhost:8001/join-queue', {
+      const response = await axios.post('https://queuetrack.site/join-queue', {
         table_name: tableName,
         ...formData,
       });
 
       if (response.data.message === 'Joined queue successfully') {
         alert('Data submitted successfully!');
-        router.push(/queuePage?page=${tableName});
+        router.push(`/queuePage?page=${tableName}`);
       } else {
         alert('Failed to join queue. Please try again.');
       }
