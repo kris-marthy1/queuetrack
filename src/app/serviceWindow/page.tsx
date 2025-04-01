@@ -190,7 +190,9 @@ function ServiceWindowContent() {
         onChange={(e) => handleInputChange(column, e.target.value)}
         variant="outlined"
         fullWidth
+        required
       >
+        <MenuItem value="">---Choose here---</MenuItem>
         <MenuItem value="None">None</MenuItem>
         <MenuItem value="PWD">PWD</MenuItem>
         <MenuItem value="Pregnant">Pregnant</MenuItem>
