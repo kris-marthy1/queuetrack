@@ -1,7 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { Suspense, useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import Navbar from '../navbar/page';
@@ -16,43 +15,45 @@ const formatLabel = (snakeCase: string) => {
     .join(' ');
 };
 
-// Separate component to handle search params
+// Email validation function
+const isValidEmail = (email: string) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 function ServiceWindowContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tableName = searchParams.get('page'); // Get table name from query params
+  const tableName = searchParams.get('page')?.toLowerCase();
 
   const [columns, setColumns] = useState<string[]>([]);
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const alertShown = useRef(false); // Track if alert has been shown
+  const alertShown = useRef(false);
 
   useEffect(() => {
-  const tableName = searchParams.get('page')?.toLowerCase(); // Get table name from query params
     const fetchQueueStatus = async () => {
       try {
-        const userIP = await axios.get('https://queuetrack.site/fetch-ip');
+        const userIP = await axios.get('http://localhost:8001/fetch-ip');
 
-
-        const response = await axios.post('https://queuetrack.site/queue-status', {
+        const response = await axios.post('http://localhost:8001/queue-status', {
           table_name: tableName
         });
-        
+
         if (response.data.in_queue) {
-          if(
+          if (
             response.data.in_queue &&
             tableName === response.data.window_name.toLowerCase() &&
             userIP.data.ip_address === response.data.ip_address &&
-            !alertShown.current // Check if alert was already shown
-          ){
-            alert(`You are already in queue for ${tableName}`)
-            alertShown.current = true; // Prevent future alerts
+            !alertShown.current
+          ) {
+            alert(`You are already in queue for ${tableName}`);
+            alertShown.current = true;
             router.push(`/queuePage?page=${tableName}`);
           }
-        } 
+        }
       } catch (err) {
-        console.log('No queue active for the user')
+        console.log('No queue active for the user');
       }
     };
 
@@ -64,13 +65,12 @@ function ServiceWindowContent() {
   useEffect(() => {
     const fetchColumns = async () => {
       try {
-        const response = await axios.post('https://queuetrack.site/get-table-columns', {
+        const response = await axios.post('http://localhost:8001/get-table-columns', {
           table_name: tableName,
         });
         setColumns(response.data);
-        // Initialize form data with empty strings for each column
         const initialFormData = response.data.reduce((acc: any, column: string) => {
-          acc[column] = column === 'priority' ? 'None' : ''; // Set 'None' for priority by default
+          acc[column] = '';
           return acc;
         }, {});
         setFormData(initialFormData);
@@ -89,8 +89,16 @@ function ServiceWindowContent() {
   };
 
   const handleSubmit = async () => {
+    // Validate email fields before submitting
+    for (const column in formData) {
+      if (column.toLowerCase().includes('email') && !isValidEmail(formData[column])) {
+        alert(`Invalid email format in ${formatLabel(column)}`);
+        return;
+      }
+    }
+
     try {
-      const response = await axios.post('https://queuetrack.site/join-queue', {
+      const response = await axios.post('http://localhost:8001/join-queue', {
         table_name: tableName,
         ...formData,
       });
@@ -145,34 +153,37 @@ function ServiceWindowContent() {
         <Typography variant="h5" mb={6} mt={2}>
           Fill out the form for: {tableName}
         </Typography>
-  
-        {columns.filter(column => column !== 'queue_id').map((column) => (
-          column === 'priority' ? (
-            <TextField
-              select
-              key={column}
-              label={formatLabel(column)}
-              value={formData[column] || 'None'} // Set "None" as default
-              onChange={(e) => handleInputChange(column, e.target.value)}
-              variant="outlined"
-              fullWidth
-            >
-              <MenuItem value="None">None</MenuItem>
-              <MenuItem value="PWD">PWD</MenuItem>
-              <MenuItem value="Pregnant">Pregnant</MenuItem>
-            </TextField>
-          ) : (
-            <TextField
-              key={column}
-              label={formatLabel(column)}
-              value={formData[column] || ''}
-              onChange={(e) => handleInputChange(column, e.target.value)}
-              variant="outlined"
-              fullWidth
-            />
-          )
-        ))}
-  
+
+        {columns
+          .filter((column) => column !== 'queue_id')
+          .map((column) =>
+            column === 'priority' ? (
+              <TextField
+                select
+                key={column}
+                label={formatLabel(column)}
+                value={formData[column] || 'None'}
+                onChange={(e) => handleInputChange(column, e.target.value)}
+                variant="outlined"
+                fullWidth
+              >
+                <MenuItem value="None">None</MenuItem>
+                <MenuItem value="PWD">PWD</MenuItem>
+                <MenuItem value="Pregnant">Pregnant</MenuItem>
+              </TextField>
+            ) : (
+              <TextField
+                key={column}
+                label={formatLabel(column)}
+                value={formData[column] || ''}
+                onChange={(e) => handleInputChange(column, e.target.value)}
+                variant="outlined"
+                fullWidth
+                type={column.toLowerCase().includes('email') ? 'email' : 'text'}
+              />
+            )
+          )}
+
         <Button
           variant="contained"
           color="primary"
@@ -184,7 +195,6 @@ function ServiceWindowContent() {
       </Box>
     </>
   );
-  
 }
 
 export default function ServiceWindow() {
