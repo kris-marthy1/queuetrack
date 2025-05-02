@@ -91,6 +91,7 @@ export default function Home() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
+                    flexDirection: 'column',
                     cursor: isDisabled ? 'not-allowed' : 'pointer',
                     padding: '1rem',
                     border: '1px solid #ffeb3d',
@@ -107,6 +108,23 @@ export default function Home() {
                   }}
                 >
                   {table.window_name} ({table.status}) - {table.description}
+                
+
+                  <Box sx={{ display: 'flex', flexDirection: 'column', }}>
+                    <Typography variant="body2">
+                      <PersonIcon sx={{ fontSize: 18, verticalAlign: 'middle', mr: 0.5 }} />
+                      {table.queue_count} in queue
+                    </Typography>
+                    {table.first_in_queue ? (
+                      <Typography variant="caption" color="text.secondary">
+                        First in Queue: Queue ID #{table.first_in_queue.queue_id}
+                      </Typography>
+                    ) : (
+                      <Typography variant="caption" color="text.secondary">
+                        No one in queue
+                      </Typography>
+                    )}
+                  </Box>
                 </Button>
               );
             }
