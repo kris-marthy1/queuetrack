@@ -68,7 +68,7 @@ export default function Home() {
             </Typography>
           ) : (tables.map(
             (
-              table: { window_id: number; window_name: string; status: string, description: string },
+              table: { window_id: number; window_name: string; status: string, queue_count: number, first_in_queue: any, description: string },
               index: number
             ) => {
               const isDisabled = table.status !== 'open'; // Disable if status is not 'open'
