@@ -106,7 +106,7 @@ export default function Home() {
                     },
                   }}
                 >
-                  {table.window_name} ({table.status})
+                  {table.window_name} ({table.status}) - {table.description}
                 </Button>
               );
             }
