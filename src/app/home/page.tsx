@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'; // Router instance for navigation
 import axios from 'axios';
 import Navbar from '../navbar/page';
 import { Box, Typography, Button } from '@mui/material';
+import PersonIcon from '@mui/icons-material/Person';
 
 export default function Home() {
   const router = useRouter();
