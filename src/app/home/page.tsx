@@ -55,7 +55,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <Box sx={{ padding: '1rem' }}>
+      <Box sx={{ padding: '1rem',marginBottom: '10%' }}>
        <Typography sx={{ fontSize: "2.125rem", fontWeight: 400, lineHeight: 1.2 }} gutterBottom>
          Queue Track
        </Typography>
