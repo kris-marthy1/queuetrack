@@ -203,7 +203,7 @@ function ServiceWindowContent() {
             {Object.entries(currentRow)
               .filter(([key]) => ['queue_id', 'priority'].includes(key))
               .map(([key, value]) => (
-              <Typography key={key} variant="body1">
+              <Typography key={key} variant="h5">
                 {`${key.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}: ${value || 'N/A'}`}
               </Typography>
             ))}
